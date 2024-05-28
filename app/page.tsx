@@ -239,7 +239,7 @@ export default function Chat() {
     <div className="h-screen flex flex-col">
       <GlobalHeader/>
       <div className="flex mx-auto mb-auto w-5/6">
-        <div className="w-full h-[calc(80vh-8rem)] sticky top-16 overflow-y-scroll overscroll-contain bg-gradient-to-b from-gray-50 to-gray-50">
+        <div className="w-full h-[calc(80vh-5rem)] sticky top-16 overflow-y-scroll overscroll-contain bg-gradient-to-b from-gray-50 to-gray-50">
           <div className="h-[400px] text-sm">
             {messages.map(m => (
               m.role === 'user' ?
@@ -261,7 +261,7 @@ export default function Chat() {
           onChange={handleInputChange}
         />
         <div className="flex flex-col w-1/3 p-2">
-        <div className="flex mx-auto w-full p-1">
+          <div className="flex mx-auto w-full p-1">
             <div className="w-1/2">
               <SkillsDropdown onSelectedSkillParent={onSelectedSkill} data={{skills: skills}}/>
             </div>
@@ -280,8 +280,6 @@ export default function Chat() {
             </button>
           </div>
         </div>
-        
-        
       </div>
       <GlobalFooter/>
     </div>
