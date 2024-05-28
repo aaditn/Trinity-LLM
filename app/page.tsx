@@ -239,8 +239,8 @@ export default function Chat() {
     <div className="h-screen flex flex-col">
       <GlobalHeader/>
       <div className="flex mx-auto mb-auto w-5/6">
-        <div className="w-full h-[calc(100vh-12rem)] sticky top-16 overflow-y-scroll overscroll-contain bg-gradient-to-b from-gray-50 to-gray-50">
-          <div className="h-[800px] text-sm">
+        <div className="w-full h-[calc(80vh-8rem)] sticky top-16 overflow-y-scroll overscroll-contain bg-gradient-to-b from-gray-50 to-gray-50">
+          <div className="h-[400px] text-sm">
             {messages.map(m => (
               m.role === 'user' ?
               <div key={m.id} className="whitespace-pre-wrap text-red-700"><br/><b>User</b>: {m.content}</div>
