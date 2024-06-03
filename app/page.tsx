@@ -95,19 +95,39 @@ function LevelDropdown({data, onSelectedLevelParent}) {
 }
 
 export default function Chat() {
-  const { messages, setMessages, input, setInput, handleInputChange, handleSubmit } = useChat();
+  const { messages, setMessages, input, setInput, handleInputChange, handleSubmit, isLoading } = useChat();
   const messagesEndRef = useRef<null | HTMLDivElement>(null)
   const [stage, setStage] = useState(0)
+  const [skill, setSkill] = useState("")
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages]);
 
+  useEffect(() => {
+    console.log(`isLoading changed ... ${isLoading} stage = ${stage}`)
+    if (!isLoading) {
+      if (stage == 1) {
+        setupPreTrainingAnswer()
+        setStage(stage + 1)
+      } else if (stage == 2 || stage == 3 || stage == 4) {
+        setupRandomTrainingQuestion()
+        setStage(stage + 1)
+      } else if (stage == 5) {
+        setupPostTrainingAnswer()
+        setStage(stage + 1)
+      } else {
+        console.log(`Stage ${stage} not coded yet`)
+      }
+    }
+  }, [isLoading])
+
   const skills = [
     { id: 0, name: 'Skill' },
     { id: 1, name: 'Communication' },
-    { id: 2, name: 'Compassion' },
-    { id: 3, name: 'Creativity' },
+    { id: 2, name: 'Entrepreneurship' },
+    { id: 3, name: "Compassion" },
+    { id: 4, name: 'Creativity' },
     { id: 5, name: 'Commitment' },
   ]
   const levels = [
@@ -130,40 +150,9 @@ export default function Chat() {
     { id: 10, name: 'What are the long-term benefits of practicing compassion and empathy towards others?'},
   ]
 
-  const runNextStage = () => {
-    switch(stage) {
-      case 0:
-        setupScenario()
-        setStage(stage + 1)
-        break;
-      case 1:
-        setupPreTrainingAnswer()
-        setStage(stage + 1)
-        break;
-      case 2:
-        setStage(stage + 1)
-      case 3:
-      case 4:
-        setupRandomQuestion()
-        setStage(stage + 1)
-        break;
-      case 5:
-        setupPostTrainingAnswer()
-        setStage(stage + 1)
-        break;
-      default:
-        console.log(`Stage ${stage} not coded yet`)
-        break;
-    }
-  }
-
-  const setupScenario = () => {
-    const prompts = [
-      "Imagine you're a teacher trying to teach the skill of compassion to high school students. You want to use a scenario based learning approach to teach that skill. Can you come up with a scenario for class discussion.",
-      "A new student named Emily has recently joined the school. She comes from a different country and is facing various challenges in adjusting to her new environment. Emily is finding it difficult to make friends, understand cultural norms, and navigate the school system. What do you think the rest of the students should do?"
-    ]
-    const randIdx = Math.floor(Math.random() * prompts.length);
-    setInput(prompts[randIdx])
+  const setupScenario = (skill: any) => {
+    const prompt = `Imagine you're a teacher trying to teach the skill of ${skill.name} to high school students. You want to use a scenario based learning approach to teach that skill. Can you come up with a scenario for class discussion.`
+    setInput(prompt)
   }
 
   const setupPreTrainingAnswer = () => {
@@ -172,13 +161,13 @@ export default function Chat() {
     messages2.push({
       id: id,
       role: "assistant",
-      content: "Please write a few sentences on the skill you would like to master.",
+      content: `Please write a few sentences on ${skill.name} to test your mastery.`,
       createdAt: new Date()
     });
     setMessages(messages2)
   }
 
-  const setupRandomQuestion = () => {
+  const setupRandomTrainingQuestion = () => {
     const randIdx = Math.floor(Math.random() * questions.length);
     let messages2 = structuredClone(messages)
     const id = nanoid(7)
@@ -203,8 +192,11 @@ export default function Chat() {
     setMessages(messages2)
   }
 
-  const onSelectedSkill = (skill: any) => {
-    console.log("SKILL: ", skill)
+  const onSelectedSkill = (skl: any) => {
+    console.log("SKILL: ", skl)
+    setSkill(skl)
+    setStage(1)
+    setupScenario(skl)
   }
 
   const onSelectedLevel = (level: any) => {
@@ -217,7 +209,7 @@ export default function Chat() {
       // setInput(input + "\nPlease evaluate the preceding paragraph. Please summarize and grade this writing.\n")
       // console.log("AFTER IN HERE NOW: ", input)
     }
-    if ([1, 2, 5, 6, 7].includes(stage)) {
+    if ([1, 2, 3, 4, 5, 6, 7].includes(stage)) {
       handleSubmit(e)
     }
     
@@ -238,48 +230,51 @@ export default function Chat() {
   return (
     <div className="h-screen flex flex-col">
       <GlobalHeader/>
-      <div className="flex mx-auto mb-auto w-5/6">
-        <div className="w-full h-[calc(80vh-5rem)] sticky top-16 overflow-y-scroll overscroll-contain bg-gradient-to-b from-gray-50 to-gray-50">
-          <div className="h-[400px] text-sm">
-            {messages.map(m => (
-              m.role === 'user' ?
-              <div key={m.id} className="whitespace-pre-wrap text-red-700"><br/><b>User</b>: {m.content}</div>
-              :
-              <div key={m.id} className="whitespace-pre-wrap text-gray-800"><br/><b>AI</b>: {m.content}</div>
-            ))}
-            <div ref={messagesEndRef} />
+      <div className="flex w-full">
+        <div className="flex w-1/12 bg-gray-100"></div>
+        <div className="flex mx-auto mb-auto w-5/6">
+          <div className="w-full h-[calc(80vh-4rem)] sticky top-16 overflow-y-scroll overscroll-contain bg-gradient-to-b from-gray-50 to-gray-50">
+            <div className="h-[400px] text-sm">
+              {messages.map(m => (
+                m.role === 'user' ?
+                <div key={m.id} className="whitespace-pre-wrap text-red-700"><br/><b>User</b>: {m.content}</div>
+                :
+                <div key={m.id} className="whitespace-pre-wrap text-gray-800"><br/><b>AI</b>: {m.content}</div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
           </div>
         </div>
+        <div className="flex w-1/12 bg-gray-100"></div>
       </div>
 
       
-      <div className="flex mx-auto w-5/6 border rounded border-gray-300">
-        <textarea
-          className="mx-auto w-2/3 mt-2 mb-2 ml-2 text-sm border border-gray-200 rounded shadow-xl"
-          value={input}
-          placeholder="Ask me something ..."
-          onChange={handleInputChange}
-        />
-        <div className="flex flex-col w-1/3 p-2">
-          <div className="flex mx-auto w-full p-1">
-            <div className="w-1/2">
-              <SkillsDropdown onSelectedSkillParent={onSelectedSkill} data={{skills: skills}}/>
+      <div className="flex w-full">
+        <div className="flex w-1/12 bg-gray-100"></div>
+        <div className="flex mx-auto w-5/6 border rounded border-gray-300">
+          <textarea
+            className="mx-auto w-2/3 mt-2 mb-2 ml-2 text-sm border border-gray-200 rounded shadow-xl"
+            value={input}
+            rows={4}
+            placeholder="Ask me something ..."
+            onChange={handleInputChange}
+          />
+          <div className="flex m-auto w-1/3 p-2">
+            <div className="flex w-3/5">
+              <div className="ml-10">
+                <SkillsDropdown onSelectedSkillParent={onSelectedSkill} data={{skills: skills}}/>
+              </div>
             </div>
-            <div className="w-1/2">
-              <LevelDropdown onSelectedLevelParent={onSelectedLevel} data={{levels: levels}}/>
+            <div className="w-2/5">
+              <button className={`m-auto w-2/3 ${isLoading ? 'bg-blue-100 text-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-700 text-white'} text-sm  font-bold py-2 px-4 rounded-full`}
+                onClick={handleSubmitAfterPrep}
+                disabled={isLoading}>
+                Submit
+              </button>
             </div>
-          </div>
-          <div className="flex mx-auto w-full p-2">
-            <button className="m-auto w-1/3 bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded-full"
-              onClick={handleSubmitAfterPrep}>
-              Submit
-            </button>
-            <button className="m-auto w-1/3 bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded-full"
-              onClick={runNextStage}>
-              Next
-            </button>
           </div>
         </div>
+        <div className="flex w-1/12 bg-gray-100"></div>
       </div>
       <GlobalFooter/>
     </div>
