@@ -12,7 +12,7 @@ import GlobalFooter from './components/GlobalFooter'
 import React from 'react';
 
 
-function SkillsDropdown({data, onSelectedSkillParent}) {
+function SkillsDropdown({data, onSelectedSkillParent}: {data: any, onSelectedSkillParent: any}) {
   const [skills, setSkills] = useState(data.skills)
   const [selectedSkill, setSelectedSkill] = useState(skills[0])
 
@@ -25,7 +25,7 @@ function SkillsDropdown({data, onSelectedSkillParent}) {
     <Listbox value={selectedSkill} onChange={(skill) => {onSelectedSkillChild(skill)}}>
       <ListboxButton>{selectedSkill.name}</ListboxButton>
       <ListboxOptions anchor="bottom" className="">
-        {skills.map((skill) => (
+        {skills.map((skill: any) => (
           <ListboxOption key={skill.id} value={skill} className="group flex gap-2 bg-white data-[focus]:bg-blue-100">
             <CheckIcon className="invisible size-5 group-data-[selected]:visible" />
             {skill.name}
@@ -58,7 +58,7 @@ function blahblah() {
 }
 
 
-function LevelDropdown({data, onSelectedLevelParent}) {
+function LevelDropdown({data, onSelectedLevelParent}: {data: any, onSelectedLevelParent: any}) {
   const levels = data.levels
   const [selectedLevel, setSelectedLevel] = useState(levels[0])
   const [query, setQuery] = useState('')
@@ -70,7 +70,7 @@ function LevelDropdown({data, onSelectedLevelParent}) {
   const filteredLevels =
     query === ''
       ? levels
-      : levels.filter((level) => {
+      : levels.filter((level: any) => {
           return level.name.toLowerCase().includes(query.toLowerCase())
         })
 
@@ -80,11 +80,11 @@ function LevelDropdown({data, onSelectedLevelParent}) {
               onClose={() => setQuery('')}>
       <ComboboxInput
         aria-label="Level"
-        displayValue={(level) => level?.name}
+        displayValue={(level: any) => level?.name}
         onChange={(event) => setQuery(event.target.value)}
       />
-      <ComboboxOptions anchor="center start" className="empty:hidden">
-        {filteredLevels.map((level) => (
+      <ComboboxOptions className="empty:hidden">
+        {filteredLevels.map((level: any) => (
           <ComboboxOption key={level.id} value={level} className="data-[focus]:bg-blue-100">
             {level.name}
           </ComboboxOption>
@@ -98,7 +98,7 @@ export default function Chat() {
   const { messages, setMessages, input, setInput, handleInputChange, handleSubmit, isLoading } = useChat();
   const messagesEndRef = useRef<null | HTMLDivElement>(null)
   const [stage, setStage] = useState(0)
-  const [skill, setSkill] = useState("")
+  const [skill, setSkill] = useState({id: 0, name: ""})
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -203,7 +203,7 @@ export default function Chat() {
     console.log("LEVEL: ", level)
   }
 
-  const handleSubmitAfterPrep =(e) => {
+  const handleSubmitAfterPrep = (e: any) => {
     console.log("stage = ", stage, input)
     if (stage == 2) {
       // setInput(input + "\nPlease evaluate the preceding paragraph. Please summarize and grade this writing.\n")
